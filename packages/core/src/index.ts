@@ -40,3 +40,7 @@ export { validateLine, validateDocument } from './validation.js';
 
 // Normalizatsiya
 export { normalizeProductName } from './normalize.js';
+
+// Ro'yxat tahlili
+export type { ParsedListRow, ParsedList, ParseQtyResult, ParsePriceResult } from './parse-list.js';
+export { parseProductList, parseQtyMilli, parseUnitPriceText } from './parse-list.js';

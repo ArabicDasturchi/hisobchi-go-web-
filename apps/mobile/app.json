@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Hisobchi Go",
+    "slug": "hisobchi-go",
+    "scheme": "hisobchigo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "uz.unikorumlar.hisobchigo"
+    },
+    "android": {
+      "package": "uz.unikorumlar.hisobchigo",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "softwareKeyboardLayoutMode": "resize",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Hisobchi Go mahsulot ro'yxatini ovoz orqali kiritish uchun mikrofondan foydalanadi.",
+          "speechRecognitionPermission": "Hisobchi Go aytilgan ro'yxatni matnga aylantirish uchun nutqni aniqlashdan foydalanadi."
+        }
+      ]
+    ]
+  }
+}

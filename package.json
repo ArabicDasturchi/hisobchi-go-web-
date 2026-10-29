@@ -8,10 +8,16 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "npm run test --workspace=packages/core",
-    "test:core": "npm run test --workspace=packages/core"
+    "test": "npm run test --workspace=packages/core && npm run test --workspace=apps/mobile",
+    "test:core": "npm run test --workspace=packages/core",
+    "test:mobile": "npm run test --workspace=apps/mobile",
+    "typecheck": "npm run typecheck --workspace=packages/core && npm run typecheck --workspace=apps/mobile"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "overrides": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   }
 }
