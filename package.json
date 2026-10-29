@@ -1,0 +1,17 @@
+{
+  "name": "hisobchi-go",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ulgurji savdo uchun aqlli hisob-kitob platformasi",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspace=packages/core",
+    "test:core": "npm run test --workspace=packages/core"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
