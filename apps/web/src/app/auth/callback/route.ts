@@ -18,10 +18,12 @@ const OTP_TYPES: readonly EmailOtpType[] = ['signup', 'invite', 'magiclink', 're
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const next = safeNextPath(url.searchParams.get('next'));
+  const via = url.searchParams.get('via');
   const fail = (reason: CallbackFailure) => NextResponse.redirect(new URL(`/login?error=${reason}`, url.origin));
 
-  const providerError = url.searchParams.get('error_code') ?? url.searchParams.get('error');
-  if (providerError) return fail(callbackFailure({ errorCode: providerError, next }));
+  // OAuth bekor qilinsa Supabase ?error=access_denied (error_code'siz) qaytaradi; email havolasida error_code bor
+  const providerError = via === 'google' ? url.searchParams.get('error') : (url.searchParams.get('error_code') ?? url.searchParams.get('error'));
+  if (providerError) return fail(callbackFailure({ errorCode: providerError, next, via }));
 
   const supabase = await getServerSupabase();
   const code = url.searchParams.get('code');
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
   let isRecovery = type === 'recovery';
   if (code) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) return fail(callbackFailure({ exchangeMessage: error.message, next }));
+    if (error) return fail(callbackFailure({ exchangeMessage: error.message, next, via }));
     userId = data.user?.id ?? null;
     // auth-js parol tiklash oqimini verifier yonida belgilaydi
     if ((data as { redirectType?: string | null }).redirectType === 'recovery') isRecovery = true;
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
     if (error) return fail(callbackFailure({ exchangeMessage: error.message, next }));
     userId = data.user?.id ?? null;
   } else {
-    return fail('link');
+    return fail(via === 'google' ? 'oauth_failed' : 'link');
   }
 
   // Yangi sessiya bilan o'z a'zoligini o'qish (RLS: foydalanuvchi faqat o'z do'koni a'zoligini ko'radi)

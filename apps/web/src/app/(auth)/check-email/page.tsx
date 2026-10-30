@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Alert, Button, Input } from '@/components/ui/primitives';
 import { authCallbackUrl } from '@/lib/env';
-import { toAppError } from '@/lib/errors';
+import { classifySignupError } from '@/lib/authErrors';
 import { getSupabase } from '@/lib/supabase/client';
 import { emailSchema, firstError } from '@/lib/validation';
 
@@ -45,7 +45,8 @@ function CheckEmail() {
       setMsg({ tone: 'green', text: 'Xat qayta yuborildi.' });
       setCooldown(COOLDOWN);
     } catch (e) {
-      setMsg({ tone: 'red', text: toAppError(e).message });
+      const info = classifySignupError(e);
+      setMsg({ tone: 'red', text: info.code ? `${info.message} (kod: ${info.code})` : info.message });
     } finally {
       setBusy(false);
     }

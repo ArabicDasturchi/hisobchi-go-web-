@@ -104,3 +104,34 @@ describe('/auth/callback — xatolar', () => {
     expect(await call('?code=abc&next=%2F%2Fevil.com')).toBe('/dashboard');
   });
 });
+
+describe('/auth/callback — Google OAuth', () => {
+  it("muvaffaqiyatli Google kirish: yangi foydalanuvchi → /onboarding, do'koni bor → /dashboard", async () => {
+    expect(await call('?code=g1&next=%2Fdashboard&via=google')).toBe('/onboarding');
+    state.members = { data: [{ shop_id: 's1' }], error: null };
+    expect(await call('?code=g2&next=%2Fdashboard&via=google')).toBe('/dashboard');
+  });
+
+  it('Google oynasida bekor qilish → oauth_cancelled (email havolasi xatosi bilan aralashmaydi)', async () => {
+    expect(await call('?error=access_denied&error_description=The+user+denied&next=%2Fdashboard&via=google')).toBe('/login?error=oauth_cancelled');
+    expect(state.calls).toEqual([]);
+  });
+
+  it('Google provayder xatosi yoki code yo\'q → oauth_failed', async () => {
+    expect(await call('?error=server_error&next=%2Fdashboard&via=google')).toBe('/login?error=oauth_failed');
+    expect(await call('?next=%2Fdashboard&via=google')).toBe('/login?error=oauth_failed');
+    state.exchange = { data: { user: null }, error: { message: 'invalid flow state' } };
+    expect(await call('?code=bad&next=%2Fdashboard&via=google')).toBe('/login?error=oauth_failed');
+  });
+
+  it('email havolasi xatolari avvalgidek', async () => {
+    expect(await call('?error=access_denied&error_code=otp_expired')).toBe('/login?error=expired');
+  });
+});
+
+describe('oauthCallbackUrl', () => {
+  it("next kodlanadi va via=google qo'shiladi", async () => {
+    const { oauthCallbackUrl } = await import('@/lib/env');
+    expect(oauthCallbackUrl('/dashboard', 'https://hisobchi-go-mvp.vercel.app')).toBe('https://hisobchi-go-mvp.vercel.app/auth/callback?next=%2Fdashboard&via=google');
+  });
+});

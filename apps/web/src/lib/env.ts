@@ -34,3 +34,8 @@ export function authBaseUrl(site: string = SITE_URL, currentOrigin?: string): st
 export function authCallbackUrl(next: string, base: string = authBaseUrl()): string {
   return `${base}/auth/callback?next=${encodeURIComponent(next)}`;
 }
+
+/** Google OAuth qaytish manzili — `via=google` callback'da bekor qilish/xatoni email havolasidan ajratadi */
+export function oauthCallbackUrl(next: string, base: string = authBaseUrl()): string {
+  return `${authCallbackUrl(next, base)}&via=google`;
+}
