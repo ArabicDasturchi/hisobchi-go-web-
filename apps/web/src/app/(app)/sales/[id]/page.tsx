@@ -170,18 +170,8 @@ export default function SaleDetailPage() {
             </div>
             <div>
               <dt className="text-xs text-muted">Turi</dt>
-              <dd className="mt-0.5 text-fg">{customer ? 'Mijoz hisobiga (qarz yoki to‘lov bilan)' : 'Naqd savdo'}</dd>
+              <dd className="mt-0.5 text-fg">{customer ? 'Mijoz hisobiga' : 'Naqd savdo'}</dd>
             </div>
-            <div>
-              <dt className="text-xs text-muted">Server tekshiruvi</dt>
-              <dd className="mt-0.5 text-fg">Summa PostgreSQL&apos;da qayta hisoblangan va mos kelgan</dd>
-            </div>
-            {doc.posted_at && (
-              <div>
-                <dt className="text-xs text-muted">Saqlangan vaqt (server)</dt>
-                <dd className="mt-0.5 text-fg">{formatDateTime(doc.posted_at)}</dd>
-              </div>
-            )}
           </dl>
         </Card>
       </div>

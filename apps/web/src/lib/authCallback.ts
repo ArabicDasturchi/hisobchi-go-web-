@@ -10,7 +10,7 @@ export type CallbackFailure = 'expired' | 'confirm_other_browser' | 'recovery_ot
 export const CALLBACK_MESSAGES: Record<CallbackFailure, string> = {
   expired: "Havola eskirgan yoki allaqachon ishlatilgan. Kiring yoki yangi tasdiqlash xatini so'rang.",
   confirm_other_browser:
-    "Email tasdiqlangan bo'lishi mumkin, lekin havola boshqa brauzerda ochildi. Email va parolingiz bilan kiring.",
+    "Email tasdiqlandi. Havola ro'yxatdan o'tilgan brauzerdan boshqa joyda ochilgani uchun avtomatik kirib bo'lmadi — email va parolingiz bilan kiring.",
   recovery_other_browser: "Parol tiklash havolasi boshqa brauzerda ochildi. Shu brauzerda qaytadan «Parolni unutdingizmi?» orqali so'rang.",
   link: "Havola noto'g'ri yoki to'liq emas. Qaytadan kiring yoki yangi havola so'rang.",
 };
@@ -27,4 +27,18 @@ export function callbackFailure(input: { errorCode?: string; exchangeMessage?: s
 
 export function isCallbackFailure(v: string | null): v is CallbackFailure {
   return v !== null && Object.hasOwn(CALLBACK_MESSAGES, v);
+}
+
+/**
+ * Sessiya yaratilgandan keyin qayerga yo'naltirish:
+ *   parol tiklash → /reset-password; do'koni yo'q → /onboarding; do'koni bor → so'ralgan sahifa
+ *   (onboarding so'ralgan bo'lsa — /dashboard, chunki do'kon allaqachon bor).
+ * `next` oldindan safeNextPath bilan tozalangan bo'lishi kerak.
+ */
+export function postAuthDestination(input: { next: string; isRecovery: boolean; hasShop: boolean | null }): string {
+  if (input.isRecovery || input.next === '/reset-password') return '/reset-password';
+  // A'zolikni aniqlab bo'lmadi — /onboarding sahifasining o'zi do'kon bor-yo'qligini tekshiradi
+  if (input.hasShop === null) return input.next;
+  if (!input.hasShop) return '/onboarding';
+  return input.next === '/onboarding' ? '/dashboard' : input.next;
 }

@@ -27,6 +27,9 @@ function readChoice(): ThemeChoice {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [choice, setChoiceState] = useState<ThemeChoice>('system');
   const [systemDark, setSystemDark] = useState(false);
+  // Saqlangan tanlov o'qilmaguncha <html> klassiga tegilmaydi: aks holda boshlang'ich "light" holati
+  // themeInitScript qo'ygan "dark" ni bir lahzaga olib tashlab, har yuklanishda miltillash beradi
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     // Saqlangan tanlov faqat brauzerda o'qiladi (SSR bilan mos kelishi uchun effektda)
@@ -35,6 +38,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage faqat mount'dan keyin mavjud
     setChoiceState(readChoice());
     onChange();
+    setReady(true);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
   }, []);
@@ -42,8 +46,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const resolved: 'light' | 'dark' = choice === 'system' ? (systemDark ? 'dark' : 'light') : choice;
 
   useEffect(() => {
+    if (!ready) return;
     document.documentElement.classList.toggle('dark', resolved === 'dark');
-  }, [resolved]);
+  }, [resolved, ready]);
 
   const setChoice = useCallback((c: ThemeChoice) => {
     setChoiceState(c);

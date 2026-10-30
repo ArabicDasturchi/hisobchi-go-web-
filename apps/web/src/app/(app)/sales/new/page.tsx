@@ -182,13 +182,13 @@ function NewSale({ data }: { data: ShopData }) {
       <Link href="/sales" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-fg">
         <ArrowLeft className="h-4 w-4" /> Savdolar
       </Link>
-      <PageHeader title="Yangi savdo" description="Summalar butun so'mda hisoblanadi va serverda qayta tekshiriladi." />
+      <PageHeader title="Yangi savdo" description="Mijoz, mahsulotlar va to'lov turini kiriting" />
 
       {phase.kind === 'payment_failed' && (
         <Alert tone="amber" title="Savdo saqlandi, lekin to'lov yozilmadi" className="mb-4">
           <p>{phase.message}</p>
           <p className="mt-1">
-            Savdo {shortNumber(phase.saleId)} serverda mavjud. <Money value={phase.plan.paidNow} className="font-semibold" /> to&apos;lovni qayta yuboring yoki keyinroq mijoz sahifasidan kiriting.
+            Savdo {shortNumber(phase.saleId)} saqlandi. <Money value={phase.plan.paidNow} className="font-semibold" /> to&apos;lovni qayta yuboring yoki keyinroq mijoz sahifasidan kiriting.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button size="sm" onClick={retryPayment} icon={<RotateCw className="h-3.5 w-3.5" />}>
@@ -389,7 +389,7 @@ function NewSale({ data }: { data: ShopData }) {
                   {formError}
                   {locked && (
                     <span className="mt-1 block text-xs">
-                      Savdo serverda saqlangan bo&apos;lishi mumkin. «Qayta urinish» o&apos;sha savdoni takrorlamaydi — server uni bir martalik kalit bo&apos;yicha taniydi.
+                      Savdo saqlangan bo&apos;lishi mumkin. «Qayta urinish» uni ikki marta yozmaydi.
                     </span>
                   )}
                 </Alert>
@@ -407,7 +407,7 @@ function NewSale({ data }: { data: ShopData }) {
               )}
               <p className="flex items-start gap-1.5 text-xs text-muted">
                 <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                Server summani mustaqil hisoblaydi; mos kelmasa savdo saqlanmaydi.
+                Summa saqlashdan oldin qayta tekshiriladi.
               </p>
             </div>
           </Card>

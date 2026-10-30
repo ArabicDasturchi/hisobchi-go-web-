@@ -23,7 +23,6 @@ import type {
   SaleDetail,
   SaleDoc,
   SaleLine,
-  ShopMember,
   Unit,
 } from './types';
 
@@ -89,10 +88,6 @@ export async function renameShop(sb: SB, shopId: string, name: string): Promise<
   const rows = check(await sb.from('shops').update({ name: name.trim() }).eq('id', shopId).select('id')) as { id: string }[] | null;
   // RLS faqat egaga ruxsat beradi; ruxsat bo'lmasa xato emas, 0 qator qaytadi
   if (!rows || rows.length === 0) throw new AppError('forbidden', "Do'kon nomini faqat egasi o'zgartira oladi.");
-}
-
-export async function listMembers(sb: SB, shopId: string): Promise<ShopMember[]> {
-  return (check(await sb.from('shop_members').select('user_id, role, created_at').eq('shop_id', shopId).order('created_at')) ?? []) as ShopMember[];
 }
 
 // ---------------------------------------------------------------------------
@@ -374,10 +369,3 @@ export async function voidPayment(sb: SB, shopId: string, paymentId: string, rea
   if (!row) throw new AppError('unknown', "Server to'lov bekor qilinishini tasdiqlamadi.");
 }
 
-/** Server bilan aloqa tekshiruvi (sinxronlash holati uchun) — bitta yengil so'rov */
-export async function pingServer(sb: SB, shopId: string): Promise<number> {
-  const started = performance.now();
-  const res = await sb.from('shops').select('id').eq('id', shopId).maybeSingle();
-  if (res.error) throw toAppError(res.error);
-  return Math.round(performance.now() - started);
-}

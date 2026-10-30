@@ -21,12 +21,6 @@ export interface Membership {
   user_id: string;
 }
 
-export interface ShopMember {
-  user_id: string;
-  role: Role;
-  created_at: string;
-}
-
 export interface Customer {
   id: string;
   name: string;

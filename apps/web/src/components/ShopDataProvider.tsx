@@ -109,6 +109,13 @@ export function ShopDataProvider({ membership: initial, children }: { membership
     return () => document.removeEventListener('visibilitychange', onFocus);
   }, [reload, lastLoadedAt]);
 
+  // Internet qaytganda ma'lumotlar avtomatik qayta yuklanadi (holat "Sinxronlangan" ga qaytadi)
+  useEffect(() => {
+    const onOnline = () => void reload();
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, [reload]);
+
   const balances = useMemo(() => (data ? customerBalances(data.sales, data.payments) : new Map<string, CustomerBalance>()), [data]);
   const customerById = useMemo(() => new Map((data?.customers ?? []).map((c) => [c.id, c])), [data]);
 
@@ -124,5 +131,3 @@ export function useShop(): Ctx {
   if (!ctx) throw new Error('useShop ShopDataProvider ichida ishlatilishi kerak');
   return ctx;
 }
-
-

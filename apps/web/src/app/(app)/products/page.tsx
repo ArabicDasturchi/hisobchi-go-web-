@@ -149,7 +149,7 @@ function Products({ data }: { data: ShopData }) {
     <>
       <PageHeader
         title="Mahsulotlar"
-        description="Savdoda tez tanlash uchun katalog. Ombor qoldig'i yuritilmaydi."
+        description="Savdoda tez tanlash uchun mahsulotlar va narxlar"
         actions={
           <Button onClick={() => setEditing('new')} icon={<Plus className="h-4 w-4" />}>
             Mahsulot qo&apos;shish

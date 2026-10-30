@@ -1,5 +1,5 @@
 'use client';
-import { CloudOff, Loader2, RefreshCw } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { useShop } from '../ShopDataProvider';
 import { cn } from '../ui/primitives';
@@ -34,49 +34,68 @@ export function useRelativeTime(date: Date | null): string {
   const min = Math.round(sec / 60);
   if (min < 60) return `${min} daqiqa oldin`;
   const h = Math.round(min / 60);
-  return `${h} soat oldin`;
+  if (h < 24) return `${h} soat oldin`;
+  return `${Math.round(h / 24)} kun oldin`;
 }
 
+export type SyncState = 'synced' | 'syncing' | 'problem' | 'offline';
+
+export const SYNC_LABELS: Record<SyncState, string> = {
+  synced: 'Sinxronlangan',
+  syncing: 'Sinxronlanmoqda…',
+  problem: 'Ulanishda muammo',
+  offline: "Internet yo'q",
+};
+
 /**
- * Bulut holati: web ilova to'g'ridan-to'g'ri Supabase bilan ishlaydi (lokal navbat yo'q),
- * shuning uchun holat = internet + oxirgi muvaffaqiyatli yuklash vaqti + oxirgi xato.
+ * Haqiqiy holat: web ilova har bir amalni darhol serverga yozadi, lokal navbat yo'q.
+ * Shuning uchun holat = internet + oxirgi yuklash natijasi (ShopDataProvider).
  */
-export function SyncIndicator({ compact }: { compact?: boolean }) {
+export function syncStateOf(input: { online: boolean; loading: boolean; error: string | null }): SyncState {
+  if (!input.online) return 'offline';
+  if (input.loading) return 'syncing';
+  if (input.error) return 'problem';
+  return 'synced';
+}
+
+export function useSyncStatus() {
   const { loading, error, lastLoadedAt, reload } = useShop();
   const online = useOnline();
+  const state = syncStateOf({ online, loading, error });
+  return { state, label: SYNC_LABELS[state], online, error, lastLoadedAt, reload, loading };
+}
+
+export function SyncDot({ state, className }: { state: SyncState; className?: string }) {
+  if (state === 'syncing') return <Loader2 className={cn('h-3.5 w-3.5 animate-spin text-amber-500', className)} aria-hidden />;
+  return (
+    <span
+      className={cn('inline-block h-2 w-2 shrink-0 rounded-full', state === 'synced' ? 'bg-emerald-500' : 'bg-rose-500', className)}
+      aria-hidden
+    />
+  );
+}
+
+/** Header'dagi ixcham holat; bosilsa — ma'lumotlar qayta yuklanadi */
+export function SyncIndicator({ compact }: { compact?: boolean }) {
+  const { state, label, lastLoadedAt, reload, loading } = useSyncStatus();
   const rel = useRelativeTime(lastLoadedAt);
-
-  const state = !online ? 'offline' : loading ? 'loading' : error ? 'error' : 'ok';
-  const label =
-    state === 'offline' ? "Internet yo'q" : state === 'loading' ? 'Yangilanmoqda…' : state === 'error' ? 'Ulanish xatosi' : `Bulut bilan mos · ${rel}`;
-
+  const title = state === 'synced' ? `${label} · ${rel}. Yangilash uchun bosing` : `${label}. Qayta urinish uchun bosing`;
   return (
     <button
       type="button"
       onClick={() => void reload()}
       disabled={loading}
-      title="Ma'lumotlarni serverdan qayta yuklash"
+      title={title}
+      aria-label={title}
       className={cn(
-        'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-        state === 'ok' && 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-300',
-        state === 'loading' && 'border-line bg-surface text-muted',
-        (state === 'error' || state === 'offline') && 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/25 dark:bg-rose-500/10 dark:text-rose-300',
+        'inline-flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors disabled:cursor-default',
+        state === 'synced' && 'text-muted hover:bg-subtle hover:text-fg',
+        state === 'syncing' && 'text-muted',
+        (state === 'problem' || state === 'offline') && 'bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-300',
       )}
     >
-      {state === 'loading' ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-      ) : state === 'ok' ? (
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-        </span>
-      ) : state === 'offline' ? (
-        <CloudOff className="h-3.5 w-3.5" />
-      ) : (
-        <RefreshCw className="h-3.5 w-3.5" />
-      )}
+      <SyncDot state={state} />
       {!compact && <span className="whitespace-nowrap">{label}</span>}
-      {compact && <span className="sr-only">{label}</span>}
     </button>
   );
 }

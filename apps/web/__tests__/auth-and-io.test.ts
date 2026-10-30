@@ -102,3 +102,55 @@ describe('CSV eksport', () => {
     expect(lines[3]).toBe("O'tkazma;");
   });
 });
+
+describe('sinxronlash holati', () => {
+  it("haqiqiy holatdan aniqlanadi: internet → yuklanish → xato → sinxronlangan", async () => {
+    const { syncStateOf, SYNC_LABELS } = await import('@/components/layout/SyncIndicator');
+    expect(syncStateOf({ online: false, loading: true, error: 'x' })).toBe('offline');
+    expect(syncStateOf({ online: true, loading: true, error: 'x' })).toBe('syncing');
+    expect(syncStateOf({ online: true, loading: false, error: 'x' })).toBe('problem');
+    expect(syncStateOf({ online: true, loading: false, error: null })).toBe('synced');
+    expect(SYNC_LABELS.synced).toBe('Sinxronlangan');
+  });
+});
+
+describe("profil ismi (ixtiyoriy)", () => {
+  it("bo'sh qoldirish mumkin, aks holda 2–80 belgi", async () => {
+    const { profileNameSchema } = await import('@/lib/validation');
+    expect(profileNameSchema.safeParse('').success).toBe(true);
+    expect(profileNameSchema.safeParse('   ').success).toBe(true); // trim → bo'sh
+    expect(profileNameSchema.safeParse('A').success).toBe(false);
+    expect(profileNameSchema.safeParse('Anvar').success).toBe(true);
+    expect(profileNameSchema.safeParse('x'.repeat(81)).success).toBe(false);
+  });
+});
+
+describe('tasdiqlashdan keyingi yo\'naltirish (avtomatik kirish)', () => {
+  it("do'koni yo'q yangi foydalanuvchi → /onboarding", async () => {
+    const { postAuthDestination } = await import('@/lib/authCallback');
+    expect(postAuthDestination({ next: '/onboarding', isRecovery: false, hasShop: false })).toBe('/onboarding');
+    expect(postAuthDestination({ next: '/dashboard', isRecovery: false, hasShop: false })).toBe('/onboarding');
+  });
+
+  it("do'koni bor foydalanuvchi → /dashboard (onboarding'ga qaytarilmaydi)", async () => {
+    const { postAuthDestination } = await import('@/lib/authCallback');
+    expect(postAuthDestination({ next: '/onboarding', isRecovery: false, hasShop: true })).toBe('/dashboard');
+    expect(postAuthDestination({ next: '/customers', isRecovery: false, hasShop: true })).toBe('/customers');
+  });
+
+  it('parol tiklash har doim /reset-password ga', async () => {
+    const { postAuthDestination } = await import('@/lib/authCallback');
+    expect(postAuthDestination({ next: '/onboarding', isRecovery: true, hasShop: true })).toBe('/reset-password');
+    expect(postAuthDestination({ next: '/reset-password', isRecovery: false, hasShop: null })).toBe('/reset-password');
+  });
+
+  it("a'zolikni aniqlab bo'lmasa — so'ralgan sahifa (u yerda qayta tekshiriladi)", async () => {
+    const { postAuthDestination } = await import('@/lib/authCallback');
+    expect(postAuthDestination({ next: '/onboarding', isRecovery: false, hasShop: null })).toBe('/onboarding');
+  });
+
+  it('boshqa brauzerda ochilgan havola uchun xabar email tasdiqlanganini aytadi', async () => {
+    const { CALLBACK_MESSAGES } = await import('@/lib/authCallback');
+    expect(CALLBACK_MESSAGES.confirm_other_browser).toMatch(/^Email tasdiqlandi/);
+  });
+});

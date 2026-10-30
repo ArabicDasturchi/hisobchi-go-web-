@@ -23,7 +23,12 @@ export const productNameSchema = z.string().trim().min(1, 'Mahsulot nomini kirit
 
 export const reasonSchema = z.string().trim().min(3, 'Sababni kiriting (kamida 3 belgi)').max(300, 'Sabab juda uzun');
 
-export const profileNameSchema = z.string().trim().min(2, 'Ismni kiriting (kamida 2 belgi)').max(80, 'Ism juda uzun');
+/** Ism ixtiyoriy: bo'sh qoldirilsa o'chiriladi, aks holda kamida 2 belgi */
+export const profileNameSchema = z
+  .string()
+  .trim()
+  .max(80, 'Ism juda uzun')
+  .refine((v) => v === '' || v.length >= 2, "Ism kamida 2 belgidan iborat bo'lsin yoki bo'sh qoldiring");
 
 export const shopNameSchema = z.string().trim().min(2, "Do'kon nomini kiriting (kamida 2 belgi)").max(80, 'Nom juda uzun');
 

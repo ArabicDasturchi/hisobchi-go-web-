@@ -12,6 +12,12 @@ import { isActive, NAV_ITEMS } from './nav';
 import { SyncIndicator } from './SyncIndicator';
 import { ThemeToggle } from './ThemeToggle';
 
+/** Ism kiritilgan bo'lsa — ism, aks holda email */
+function displayName(user: ReturnType<typeof useAuth>['user']): string {
+  const name = user?.user_metadata?.full_name;
+  return typeof name === 'string' && name.trim() ? name : (user?.email ?? '');
+}
+
 function ShopBadge({ compact }: { compact?: boolean }) {
   const { membership } = useShop();
   if (compact) {
@@ -70,7 +76,7 @@ function UserMenu() {
   return (
     <div className="flex items-center gap-2">
       <span className="hidden max-w-[200px] truncate text-sm text-muted xl:inline" title={user?.email ?? ''}>
-        {user?.email}
+        {displayName(user)}
       </span>
       <button
         type="button"
@@ -79,6 +85,8 @@ function UserMenu() {
           await signOut();
         }}
         disabled={busy}
+        aria-label={uz.nav.signOut}
+        title={uz.nav.signOut}
         className="inline-flex h-9 items-center gap-2 rounded-xl px-2.5 text-sm font-medium text-muted transition-colors hover:bg-subtle hover:text-fg disabled:opacity-50"
       >
         <LogOut className="h-4 w-4" />
@@ -119,7 +127,7 @@ function Drawer({ open, onClose }: { open: boolean; onClose: () => void }) {
         </div>
         <div className="mt-4 space-y-3 border-t border-line pt-4">
           <SyncIndicator />
-          <p className="truncate text-xs text-muted">{user?.email}</p>
+          <p className="truncate text-xs text-muted">{displayName(user)}</p>
           <button
             type="button"
             onClick={() => void signOut()}

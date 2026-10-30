@@ -42,7 +42,7 @@ function Dashboard({ data }: { data: ShopData }) {
     <>
       <PageHeader
         title="Bosh sahifa"
-        description={`${membership.shop.name} — joriy holat (server ma'lumotlari)`}
+        description={`${membership.shop.name} — bugungi holat`}
         actions={
           <LinkButton href="/sales/new" icon={<Plus className="h-4 w-4" />}>
             {uz.nav.newSale}

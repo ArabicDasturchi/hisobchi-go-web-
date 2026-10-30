@@ -3,10 +3,10 @@ import type { ReactNode } from 'react';
 import { Logo } from '../Logo';
 
 const FEATURES = [
-  { icon: Wallet, title: 'Aniq hisob', text: "Har bir so'm butun son sifatida, serverda qayta tekshiriladi." },
+  { icon: Wallet, title: 'Aniq hisob', text: "Har bir savdo summasi saqlashdan oldin qayta tekshiriladi." },
   { icon: Users, title: 'Mijoz qarzlari', text: "Kim qancha qarz — to'lovlar va tarix bilan." },
   { icon: BarChart3, title: 'Hisobotlar', text: 'Sana oralig\'i bo\'yicha savdo, to\'lov va CSV eksport.' },
-  { icon: ShieldCheck, title: 'Xavfsiz', text: "Ma'lumot faqat sizning do'koningizga tegishli (RLS)." },
+  { icon: ShieldCheck, title: 'Xavfsiz', text: "Ma'lumotlaringizni faqat siz ko'rasiz." },
 ];
 
 export function AuthShell({ title, subtitle, children, footer }: { title: string; subtitle?: ReactNode; children: ReactNode; footer?: ReactNode }) {
@@ -18,7 +18,7 @@ export function AuthShell({ title, subtitle, children, footer }: { title: string
         <Logo inverted />
         <div className="relative mt-auto max-w-md">
           <h2 className="text-3xl font-semibold leading-tight tracking-tight">Savdo va qarz hisobini bir joyda yuriting.</h2>
-          <p className="mt-3 text-emerald-50/80">Mobil ilova bilan bir xil hisob-kitob qoidalari va bitta bulut bazasi.</p>
+          <p className="mt-3 text-emerald-50/80">Kompyuter va telefonda bir xil ma&apos;lumotlar bilan ishlang.</p>
           <ul className="mt-10 grid grid-cols-2 gap-5">
             {FEATURES.map((f) => (
               <li key={f.title} className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
